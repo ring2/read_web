@@ -11,15 +11,7 @@
         <el-row :gutter="20">
           <el-col :span="4">
             <div style="margin-top: 13px;">
-              <el-button
-                :type="isReview==='info'?'success':'info'"
-                @click="showReviewRecommend"
-              >已审核的书籍</el-button>
-            </div>
-          </el-col>
-          <el-col :span="6">
-            <div style="margin-top: 13px;">
-              <el-button :type="isReview" @click="showNoReviewRecommend">未审核的书籍</el-button>
+              <el-tag type="success">已审核书籍</el-tag>
             </div>
           </el-col>
         </el-row>
@@ -37,6 +29,8 @@
           <el-table-column prop="reOpinion" label="审核意见"></el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
+              <el-button type="primary" size="mini" v-show="!option" @click="pass(scope.row)">上架</el-button>
+              <el-button type="primary" size="mini" v-show="!option" @click="noPass(scope.row)">下架</el-button>
               <el-button type="primary" size="mini" v-show="option" @click="read(scope.row)">阅读书籍</el-button>
               <el-button
                 type="primary"

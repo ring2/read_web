@@ -17,17 +17,31 @@
               <el-radio label="未归还"></el-radio>
             </el-radio-group>
           </el-form-item>
-          <span><el-button type="primary" size="mini" @click="getBorrowList" style="margin-left:50px">筛选</el-button></span>
+          <span>
+            <el-button type="primary" size="mini" @click="getBorrowList" style="margin-left:50px">筛选</el-button>
+          </span>
         </el-form>
-        
+
         <!--用户列表区域-->
         <el-table :data="borrowList" style="width: 100%" border stripe>
           <el-table-column type="index" label="#"></el-table-column>
           <el-table-column prop="bwBookid" label="图书编号" width="180"></el-table-column>
           <el-table-column prop="bwReaderid" label="读者编号" width="180"></el-table-column>
-          <el-table-column prop="bwOuttime" label="借出日期"></el-table-column>
-          <el-table-column prop="bwEndtime" label="到期日期"></el-table-column>
-          <el-table-column prop="bwBacktime" label="归还日期"></el-table-column>
+          <el-table-column prop="bwOuttime" label="借出日期">
+            <template slot-scope="scope">
+              <p>{{scope.row.bwOuttime | formatDate}}</p>
+            </template>
+          </el-table-column>
+          <el-table-column prop="bwEndtime" label="到期日期">
+            <template slot-scope="scope">
+              <p>{{scope.row.bwEndtime | formatDate}}</p>
+            </template>
+          </el-table-column>
+          <el-table-column prop="bwBacktime" label="归还日期">
+            <template slot-scope="scope">
+              <p>{{scope.row.bwBacktime | formatDate}}</p>
+            </template>
+          </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
               <el-button
@@ -54,6 +68,7 @@
   </div>
 </template>
 <script>
+import dateFormat from "../../assets/js/Date";
 export default {
   data() {
     return {
@@ -69,24 +84,34 @@ export default {
     };
   },
   created() {
-    this.getBorrowList()
+    this.getBorrowList();
+  },
+  filters: {
+    formatDate(time) {
+      if (time) {
+        let date = new Date(time);
+        return dateFormat.formatDate(date, "yyyy.MM.dd");
+      }
+    }
   },
   methods: {
     noticeUser() {
       this.$message({
-        type:'info',
-        message:'功能正在努力开发中',
-        duration:2000
-      })
+        type: "info",
+        message: "功能正在努力开发中",
+        duration: 2000
+      });
     },
     async getBorrowList() {
-      const param = this.param
-      const { data: res } = await this.$http.get(`/borrow/borrow_situation/${param.condition}/${param.pageNum}/${param.pageSize}`)
+      const param = this.param;
+      const { data: res } = await this.$http.get(
+        `/borrow/borrow_situation/${param.condition}/${param.pageNum}/${param.pageSize}`
+      );
       if (res.statusCode !== 200) {
         return this.$message.error(res.message);
       }
-      this.borrowList = res.data.list
-      this.total = res.data.total
+      this.borrowList = res.data.list;
+      this.total = res.data.total;
     },
     handleSizeChange(size) {
       this.param.pageSize = size;

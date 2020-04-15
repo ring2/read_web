@@ -116,6 +116,12 @@ export default {
               name: "图书类别管理",
               uri: "/home/bookType",
               icon: "el-icon-menu"
+            },
+            {
+              id: 659,
+              name: "已审核书籍",
+              uri: "/home/reviewed",
+              icon: "el-icon-menu"
             }
           ]
         },
@@ -129,20 +135,6 @@ export default {
               id: 17,
               name: "公告列表",
               uri: "/home/announcement",
-              icon: "el-icon-s-promotion"
-            }
-          ]
-        },
-        {
-          id: 21,
-          name: "资源管理",
-          uri: "/resource",
-          icon: "el-icon-menu",
-          children: [
-            {
-              id: 26,
-              name: "资源列表",
-              uri: "/home/resource",
               icon: "el-icon-s-promotion"
             }
           ]
@@ -171,6 +163,26 @@ export default {
               id: 36,
               name: "读者书卷管理",
               uri: "/home/booktoken",
+              icon: "el-icon-s-custom"
+            }
+          ]
+        },
+        {
+          id: 24,
+          name: "数据统计",
+          uri: "/datacount",
+          icon: "el-icon-menu",
+          children: [
+            {
+              id: 46,
+              name: "阅读排行榜",
+              uri: "/home/read_rank",
+              icon: "el-icon-s-custom"
+            },
+            {
+              id: 56,
+              name: "读者推荐榜",
+              uri: "/home/reader_rank",
               icon: "el-icon-s-custom"
             }
           ]

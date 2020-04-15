@@ -42,6 +42,10 @@ const routes = [
         component: () => import('@/components/book/Book')
       },
       {
+        path: '/home/reviewed',
+        component: () => import('@/components/book/Reviewed')
+      },
+      {
         path: '/home/bookType',
         component: () => import('@/components/book/BookType')
       },
@@ -64,6 +68,14 @@ const routes = [
       {
         path: '/home/personal',
         component: () => import('@/components/my/Personal')
+      },
+      {
+        path: '/home/read_rank',
+        component: () => import('@/components/datacount/ReadRank')
+      },
+      {
+        path: '/home/reader_rank',
+        component: () => import('@/components/datacount/ReaderRank')
       }
     ]
   }
