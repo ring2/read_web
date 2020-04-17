@@ -28,24 +28,24 @@
     <!--专家登录时展示-->
     <el-card v-if="!showFlag" class="box-card">
       <div v-show="one">
-        <el-form disabled="" ref="form" :model="expert" label-width="80px">
+        <el-form disabled ref="form" :model="expert" label-width="80px">
           <el-form-item label="账号名称">
             <el-input v-model="expert.exUsername" disabled class="form-input"></el-input>
           </el-form-item>
           <el-form-item label="账号密码">
-            <el-input v-model="expert.exPwd"  class="form-input"></el-input>
+            <el-input v-model="expert.exPwd" class="form-input"></el-input>
           </el-form-item>
           <el-form-item label="姓名">
-            <el-input v-model="expert.exName"  class="form-input"></el-input>
+            <el-input v-model="expert.exName" class="form-input"></el-input>
           </el-form-item>
           <el-form-item label="手机号">
-            <el-input v-model="expert.exPhone"  class="form-input"></el-input>
+            <el-input v-model="expert.exPhone" class="form-input"></el-input>
           </el-form-item>
           <el-form-item label="地址">
-            <el-input v-model="expert.exAddr"  class="form-input">></el-input>
+            <el-input v-model="expert.exAddr" class="form-input">></el-input>
           </el-form-item>
           <el-form-item label="身份证号">
-            <el-input v-model="expert.exIdentity" class="form-input" >></el-input>
+            <el-input v-model="expert.exIdentity" class="form-input">></el-input>
           </el-form-item>
           <el-form-item label="新密码" v-show="passwordFlag">
             <el-input v-model="expert.newPwd" class="form-input" type="password" show-password>></el-input>
@@ -62,7 +62,13 @@
             <el-input v-model="expert.exUsername" disabled class="form-input"></el-input>
           </el-form-item>
           <el-form-item label="密码">
-            <el-input v-model="expert.exPwd" disabled="" class="form-input" type="password" show-password>></el-input>
+            <el-input
+              v-model="expert.exPwd"
+              disabled
+              class="form-input"
+              type="password"
+              show-password
+            >></el-input>
           </el-form-item>
           <el-form-item label="新密码" v-show="!one">
             <el-input v-model="expert.newPwd" class="form-input" type="password" show-password>></el-input>
@@ -75,13 +81,38 @@
         <el-button v-show="!one" @click="cancelUpdate1" type="primary">取消</el-button>
       </div>
       <el-button v-show="one" @click="updatePwd1" type="primary">修改密码</el-button>
+      <el-button v-show="one" @click="showDialog" type="primary">修改资料</el-button>
     </el-card>
+    <el-dialog title="修改资料" :visible.sync="infoFlag" width="30%">
+      <el-form ref="updateExpertForm" :model="updateExpertForm" label-width="80px">
+        <el-form-item label="账号名称">
+          <el-input v-model="updateExpertForm.exUsername"  class="form-input"></el-input>
+        </el-form-item>
+        <el-form-item label="手机号">
+          <el-input
+            v-model="updateExpertForm.exPhone"
+            class="form-input"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="地址">
+          <el-input
+            v-model="updateExpertForm.exAddr"
+            class="form-input"
+          ></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="infoFlag = false">取 消</el-button>
+        <el-button type="primary" @click="updateInfo">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
 export default {
   data() {
     return {
+      infoFlag: false,
       one: true,
       flagOne: true,
       passwordFlag: false,
@@ -104,6 +135,7 @@ export default {
         newPwd: "",
         confimPwd: ""
       },
+      updateExpertForm: {},
       showFlag: true
     };
   },
@@ -118,15 +150,31 @@ export default {
     }
   },
   methods: {
+    showDialog() {
+      this.infoFlag = true;
+      this.updateExpertForm = this.expert;
+    },
+    async updateInfo() {
+      const {data:res} = await this.$http.put('/expert',this.updateExpertForm)
+      if (res.statusCode !== 200) {
+        return this.$message.error(res.message)
+      }
+      this.$message.success('修改成功')
+      this.getExpert()
+      this.infoFlag = false;
+    },
     cancelUpdate1() {
-      this.one = true
+      this.one = true;
     },
     updateExpert() {
       this.flagOne = false;
       this.disableFlag = false;
     },
     async submitExpert() {
-      const { data: res } = await this.$http.put("/expert/update_pwd", this.expert);
+      const { data: res } = await this.$http.put(
+        "/expert/update_pwd",
+        this.expert
+      );
       if (res.statusCode !== 200) {
         return this.$message.error(res.message);
       }
@@ -135,7 +183,7 @@ export default {
         message: "修改密码成功",
         duration: 2000
       });
-      this.one = true
+      this.one = true;
       this.getExpert();
     },
     updatePwd() {
@@ -143,7 +191,7 @@ export default {
       this.disableFlag = false;
     },
     updatePwd1() {
-      this.one = false
+      this.one = false;
     },
     async getExpert() {
       const { data: res } = await this.$http.get(`/expert/${this.expert.id}`);

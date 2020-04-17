@@ -168,6 +168,20 @@ export default {
           ]
         },
         {
+          id: 213,
+          name: "问卷调查",
+          uri: "/investigate",
+          icon: "el-icon-menu",
+          children: [
+            {
+              id: 36,
+              name: "问卷管理",
+              uri: "/home/investigate",
+              icon: "el-icon-s-custom"
+            }
+          ]
+        },
+        {
           id: 24,
           name: "数据统计",
           uri: "/datacount",

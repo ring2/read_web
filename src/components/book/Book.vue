@@ -59,7 +59,7 @@
           <el-table-column prop="bookreadnum" label="阅读数量"></el-table-column>
           <el-table-column prop="isCharge" label="是否收费">
             <template v-slot="scope">
-              <span>{{scope.row.bookcredit == 1?'免费':'收费'}}</span>
+              <span>{{scope.row.isCharge == 1?'收费':'免费'}}</span>
             </template>
           </el-table-column>
           <el-table-column v-if="!selFlag" prop="btname" label="书籍类别"></el-table-column>
@@ -100,7 +100,7 @@
             @size-change="handleSizeChange"
             @current-change="handleCurrentChange"
             :current-page="param.pageNum"
-            :page-sizes="[1, 2, 5, 10]"
+            :page-sizes="[1, 2, 5, 6]"
             :page-size="param.pageSize"
             layout="total, sizes, prev, pager, next, jumper"
             :total="total"
@@ -236,7 +236,7 @@ export default {
         bookname: "",
         pageNum: 1,
         pageSize: 5,
-        isCharge: "免费",
+        isCharge: "",
         bookTypeId: ""
       },
       addBookForm: {

@@ -10,19 +10,13 @@
       <el-button type="primary" @click="updateaddDialog">发布公告</el-button>
       <div>
         <!--图书类别列表区域-->
-        <el-table :data="bookTypeList" style="width: 100%" border stripe>
+        <el-table :data="bookTypeList" style="width: 60%" border stripe>
           <el-table-column type="index" label="#"></el-table-column>
           <el-table-column prop="annoTitle" label="公告标题" width="180"></el-table-column>
           <el-table-column prop="annoContent" label="公告内容" width="180"></el-table-column>
           <el-table-column prop="annoPublishtime" label="发布时间" width="180">
             <template slot-scope="scope">
               <p>{{scope.row.annoPublishtime | formatDate}}</p>
-            </template>
-          </el-table-column>
-          <el-table-column prop="annoCancel" label="是否撤销" width="180"></el-table-column>
-          <el-table-column prop="annoCanceltime" label="撤销时间" width="180">
-            <template slot-scope="scope">
-              <p>{{scope.row.annoCanceltime | formatDate}}</p>
             </template>
           </el-table-column>
           <el-table-column label="操作">

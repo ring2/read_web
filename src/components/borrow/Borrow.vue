@@ -42,15 +42,6 @@
               <p>{{scope.row.bwBacktime | formatDate}}</p>
             </template>
           </el-table-column>
-          <el-table-column label="操作">
-            <template slot-scope="scope">
-              <el-button
-                type="primary"
-                size="mini"
-                @click="noticeUser(scope.$index, scope.row)"
-              >提醒归还</el-button>
-            </template>
-          </el-table-column>
         </el-table>
         <div class="block">
           <el-pagination

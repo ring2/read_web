@@ -76,6 +76,10 @@ const routes = [
       {
         path: '/home/reader_rank',
         component: () => import('@/components/datacount/ReaderRank')
+      },
+      {
+        path: '/home/investigate',
+        component: () => import('@/components/investigate/Investigate')
       }
     ]
   }

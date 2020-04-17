@@ -27,14 +27,19 @@
           <el-table-column prop="exName" label="姓名" width="180"></el-table-column>
           <el-table-column prop="exIdentity" label="身份证号"></el-table-column>
           <el-table-column prop="expertType" label="专家类别"></el-table-column>
+          <el-table-column prop="isReview" label="审核结果">
+            <template slot-scope="scope">
+              {{scope.row.isReview == 1?'审核通过':'审核未通过'}}
+            </template>
+          </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
               <el-button
-                type="primary"
+                type="danger"
                 size="mini"
                 v-show="!option"
-                @click="updateUserDialog(scope.row)"
-              >设置专家类别</el-button>
+                @click="deleteExpert(scope.row)"
+              >删除</el-button>
               <el-button type="primary" size="mini" v-show="option" @click="pass(scope.row)">通过审核</el-button>
               <el-button type="primary" size="mini" v-show="option" @click="noPass(scope.row)">审核不通过</el-button>
             </template>
@@ -110,6 +115,14 @@ export default {
     this.getExpertType();
   },
   methods: {
+    async deleteExpert(expert) {
+      const {data:res} = await this.$http.delete(`/expert/${expert.id}`)
+      if (res.statusCode !== 200) {
+        return this.$message.error(res.message)
+      }
+      this.$message.success("删除成功")
+      this.getUserList();
+    },
     async updateExpert() {
       const { data: res } = await this.$http.put(
         "/expert",
@@ -135,7 +148,6 @@ export default {
         return this.$message.error(res.message);
       }
       this.expertTypeList = res.data;
-      console.log(this.expertTypeList);
     },
     pass(row) {
       this.updaterExpertForm = row;

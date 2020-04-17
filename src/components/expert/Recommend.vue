@@ -24,20 +24,31 @@
           </el-col>
         </el-row>
         <!--用户列表区域-->
-        <el-table :data="recommendList" style="width: 100%" border stripe>
+        <el-table :data="recommendList" :style="option?'width: 50%':'width: 100%'" border stripe>
           <el-table-column type="index" label="#"></el-table-column>
           <el-table-column prop="reReaderid" label="读者id" width="180"></el-table-column>
           <el-table-column prop="reBookid" label="审核书id" width="180"></el-table-column>
-          <el-table-column prop="reResult" label="审核结果">
+          <el-table-column prop="reResult" label="审核结果" v-if="!option">
             <template v-slot="scope">
               <span>{{scope.row.reResult == 0?'不通过':'通过'}}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="reExpertId" label="专家id"></el-table-column>
-          <el-table-column prop="reOpinion" label="审核意见"></el-table-column>
+          <el-table-column prop="reOpinion" label="审核意见" v-if="!option"></el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
               <el-button type="primary" size="mini" v-show="option" @click="read(scope.row)">阅读书籍</el-button>
+              <el-button
+                type="primary"
+                size="mini"
+                v-show="!option"
+                @click="updateRecommend1(scope.row)"
+              >编辑</el-button>
+              <el-button
+                type="danger"
+                size="mini"
+                v-show="!option"
+                @click="delRecommend(scope.row)"
+              >删除</el-button>
               <el-button
                 type="primary"
                 size="mini"
@@ -89,6 +100,29 @@
         <el-button type="primary" @click="submitRecommend">确 认</el-button>
       </span>
     </el-dialog>
+    <!--审核结果填写框-->
+    <el-dialog
+      title="修改"
+      :visible.sync="showUpdateDialog1"
+      width="30%"
+      :before-close="handleUpdateClose1"
+    >
+      <el-form :model="updateRecommendForm1" ref="updaterUserForm1" label-width="80px">
+        <el-form-item label="审核结果">
+          <el-select v-model="updateRecommendForm1.reResult" placeholder="请选择审核结果">
+            <el-option label="通过" :value="1"></el-option>
+            <el-option label="不通过" :value="0"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="审核意见" disabled>
+          <el-input type="area" v-model="updateRecommendForm1.reOpinion"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="cancelUpdateUser1">取 消</el-button>
+        <el-button type="primary" @click="submitRecommend1">确 认</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -109,21 +143,41 @@ export default {
         reResult: "",
         reExpertId: "",
         reOpinion: "",
-        reStatus:"",
+        reStatus: "",
         type: 0
       },
+      updateRecommendForm1:{},
       recommendList: [],
       total: 0,
-      showUpdateDialog: false
+      showUpdateDialog: false,
+      showUpdateDialog1: false
     };
   },
   created() {
     this.getRecommendList();
   },
   methods: {
+    updateRecommend1(row) {
+      this.showUpdateDialog1 = true;
+      this.updateRecommendForm1 = row;
+    },
+    async delRecommend() {
+      const { data: res } = await this.$http.delete(`/recommend/${id}`);
+      if (res.statusCode !== 200) {
+        return this.$message.error(res.message);
+      }
+      this.$message({
+        type: "success",
+        message: "删除成功",
+        duration: 2000
+      });
+      this.getRecommendList();
+    },
     async submitRecommend() {
-      this.updateRecommendForm.reStatus = 1
-      this.updateRecommendForm.reExpertId = JSON.parse(window.sessionStorage.getItem('user')).id
+      this.updateRecommendForm.reStatus = 1;
+      this.updateRecommendForm.reExpertId = JSON.parse(
+        window.sessionStorage.getItem("user")
+      ).id;
       const { data: res } = await this.$http.put(
         "/recommend",
         this.updateRecommendForm
@@ -136,8 +190,24 @@ export default {
         message: "已提交审核意见",
         duration: 2000
       });
-      this.getRecommendList()
-      this.showUpdateDialog = false
+      this.getRecommendList();
+      this.showUpdateDialog = false;
+    },
+    async submitRecommend1() {
+      const { data: res } = await this.$http.put(
+        "/recommend",
+        this.updateRecommendForm1
+      );
+      if (res.statusCode !== 200) {
+        return this.$message.error(res.message);
+      }
+      this.$message({
+        type: "success",
+        message: "修改成功",
+        duration: 2000
+      });
+      this.getRecommendList();
+      this.showUpdateDialog1 = false;
     },
     async updateRecommend() {
       const { data: res } = await this.$http.put(
@@ -157,19 +227,20 @@ export default {
     cancelUpdateUser() {
       this.showUpdateDialog = false;
     },
+    cancelUpdateUser1() {
+      this.showUpdateDialog1 = false;
+    },
     reviewResult(row) {
       this.showUpdateDialog = true;
       this.updateRecommendForm = row;
     },
     async read(row) {
-      const { data: res } = await this.$http.get(
-        `/book/${row.reBookid}`
-      );
+      const { data: res } = await this.$http.get(`/book/${row.reBookid}`);
       if (res.statusCode !== 200) {
         return this.$message.error(res.message);
       }
-      const url = res.data.bookUrl
-      console.log(res)
+      const url = res.data.bookUrl;
+      console.log(res);
       window.open(url);
     },
     pass(row) {
@@ -234,6 +305,10 @@ export default {
     handleUpdateClose() {
       this.$refs.updaterUserForm.resetFields();
       this.showUpdateDialog = false;
+    },
+    handleUpdateClose1() {
+      this.$refs.updaterUserForm1.resetFields();
+      this.showUpdateDialog1 = false;
     }
   }
 };

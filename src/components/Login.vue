@@ -1,6 +1,6 @@
 <template>
   <div class="login_container">
-    <div class="login_box">
+    <div class="login_box" :style="!registerFlag?'height: 360px;':'height: 560px;'">
       <!--头像-->
       <div class="avatar_box">
         <img src="../assets/book.png" alt />
@@ -63,6 +63,22 @@
           <el-form-item prop="name" style="margin-top:34px">
             <el-input prefix-icon="el-icon-edit" v-model="registerForm.exName" placeholder="请输入姓名"></el-input>
           </el-form-item>
+          <el-form-item prop="exPhone" style="margin-top:34px">
+            <el-input prefix-icon="el-icon-edit" v-model="registerForm.exPhone" placeholder="请输入手机号"></el-input>
+          </el-form-item>
+          <el-form-item prop="exAddr" style="margin-top:34px">
+            <el-input prefix-icon="el-icon-edit" v-model="registerForm.exAddr" placeholder="请输入地址"></el-input>
+          </el-form-item>
+          <el-form-item >
+          <el-select v-model="registerForm.exTypeId" placeholder="请选择专家类别">
+            <el-option
+              v-for="(item,index) in expertTypeList"
+              :key="index"
+              :label="item.etName"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
           <el-form-item prop="identity" style="margin-top:34px">
             <el-input
               prefix-icon="el-icon-user"
@@ -97,6 +113,8 @@ export default {
         exPwd: "",
         exName: "",
         exPhone: "",
+        exAddr:"",
+        exTypeId:"",
         exIdentity: ""
       },
       loginRules: {
@@ -110,7 +128,8 @@ export default {
         ],
         result: [{ required: true, message: "请输入验证码", trigger: "blur" }]
       },
-      loading: false
+      loading: false,
+      expertTypeList:[]
     };
   },
   created() {
@@ -125,6 +144,14 @@ export default {
     },
     showRegister() {
       this.registerFlag = !this.registerFlag;
+      this.getExpertType();
+    },
+    async getExpertType() {
+      const { data: res } = await this.$http.get("/expert/expert_type");
+      if (res.statusCode !== 200) {
+        return this.$message.error(res.message);
+      }
+      this.expertTypeList = res.data;
     },
     async register() {
       const { data: res } = await this.$http.post(
@@ -190,7 +217,6 @@ export default {
 }
 .login_box {
   background-color: #fff;
-  height: 360px;
   width: 450px;
   position: absolute;
   left: 50%;
