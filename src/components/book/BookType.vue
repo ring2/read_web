@@ -25,15 +25,15 @@
                 type="danger"
                 icon="el-icon-delete"
                 size="mini"
-                @click="deleteBookType(scope.row.id)"
+                @click="deleteBookType1(scope.row.id)"
               ></el-button>
             </template>
           </el-table-column>
         </el-table>
         <div class="block">
           <el-pagination
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
+            @size-change="handleSizeChange1"
+            @current-change="handleCurrentChange1"
             :current-page="param.pageNum"
             :page-sizes="[1, 2, 5, 10]"
             :page-size="param.pageSize"
@@ -146,15 +146,15 @@ export default {
       this.getBookTypeList();
       this.showaddDialog = false;
     },
-    handleSizeChange(size) {
+    handleSizeChange1(size) {
       this.param.pageSize = size;
       this.getBookTypeList();
     },
-    handleCurrentChange(pageNo) {
+    handleCurrentChange1(pageNo) {
       this.param.pageNum = pageNo;
       this.getBookTypeList();
     },
-    async deleteBookType(id) {
+    async deleteBookType1(id) {
       const { data: res } = await this.$http.delete(`/book/book_type/${id}`);
       if (res.statusCode !== 200) {
         return this.$message.error(res.message);

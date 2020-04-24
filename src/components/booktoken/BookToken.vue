@@ -16,7 +16,12 @@
           <el-table-column prop="btnNum" label="书卷数量" width="180"></el-table-column>
           <el-table-column prop="btnCredit" label="书卷所需积分" width="180"></el-table-column>
           <el-table-column prop="btnExplain" label="书卷说明" width="180"></el-table-column>
-          <el-table-column prop="btnTime" label="书券有效期" width="180">
+          <el-table-column prop="btnBegin" label="书券生效期" width="180">
+            <template slot-scope="scope">
+              <p>{{scope.row.btnBegin | formatDate}}</p>
+            </template>
+          </el-table-column>
+          <el-table-column prop="btnTime" label="书券失效期" width="180">
             <template slot-scope="scope">
               <p>{{scope.row.btnTime | formatDate}}</p>
             </template>
@@ -71,7 +76,10 @@
         <el-form-item label="书卷说明">
           <el-input v-model="updaterBookTypeForm.btnExplain"></el-input>
         </el-form-item>
-        <el-form-item label="书券有效期">
+        <el-form-item label="书券生效期">
+           <el-date-picker type="date" placeholder="选择日期" v-model="updaterBookTypeForm.btnBegin" style="width: 100%;"></el-date-picker>
+        </el-form-item>
+        <el-form-item label="书券失效期">
            <el-date-picker type="date" placeholder="选择日期" v-model="updaterBookTypeForm.btnTime" style="width: 100%;"></el-date-picker>
         </el-form-item>
       </el-form>
@@ -87,7 +95,7 @@
       width="30%"
       :before-close="handleaddClose"
     >
-      <el-form :model="addBookTypeForm" ref="addBookForm" label-width="80px">
+      <el-form :model="addBookTypeForm" ref="addBookForm" label-width="100px">
         <el-form-item label="书卷名称">
           <el-input v-model="addBookTypeForm.btnName"></el-input>
         </el-form-item>
@@ -100,7 +108,10 @@
         <el-form-item label="书卷说明">
           <el-input v-model="addBookTypeForm.btnExplain"></el-input>
         </el-form-item>
-        <el-form-item label="书券有效期">
+        <el-form-item label="书券生效期">
+           <el-date-picker type="date" placeholder="选择日期" v-model="addBookTypeForm.btnBegin" style="width: 100%;"></el-date-picker>
+        </el-form-item>
+        <el-form-item label="书券失效期">
            <el-date-picker type="date" placeholder="选择日期" v-model="addBookTypeForm.btnTime" style="width: 100%;"></el-date-picker>
         </el-form-item>
       </el-form>

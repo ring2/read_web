@@ -22,8 +22,14 @@
               </el-input>
             </div>
           </el-col>
-          <el-col :span="4">
+          <el-col :span="2">
             <el-button type="primary" style="margin-top: 5px;" @click="addBookDialog()">添加图书</el-button>
+          </el-col>
+          <el-col :span="2">
+            <el-button type="primary" style="margin-top: 5px;" @click="dialogTableVisible11=true">书籍分类</el-button>
+          </el-col>
+          <el-col :span="2">
+            <el-button type="primary" style="margin-top: 5px;" @click="showaddDialog11=true">添加分类</el-button>
           </el-col>
         </el-row>
         <el-row>
@@ -97,8 +103,8 @@
         </el-table>
         <div class="block">
           <el-pagination
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
+            @size-change="handleSizeChange1"
+            @current-change="handleCurrentChange1"
             :current-page="param.pageNum"
             :page-sizes="[1, 2, 5, 6]"
             :page-size="param.pageSize"
@@ -223,12 +229,92 @@
         <el-button type="primary" @click="submitAddBook">确 认</el-button>
       </span>
     </el-dialog>
+    <!--图书类别-->
+    <el-dialog title="书籍类别列表" :visible.sync="dialogTableVisible11">
+      <!--图书类别列表区域-->
+        <el-table :data="bookTypeList1" style="width: 60%" border stripe>
+          <el-table-column type="index" label="#"></el-table-column>
+          <el-table-column prop="btName" label="类别名称" width="180"></el-table-column>
+          <el-table-column label="操作">
+            <template slot-scope="scope">
+              <el-button
+                type="primary"
+                icon="el-icon-edit"
+                size="mini"
+                @click="updateUserDialog11(scope.$index, scope.row)"
+              ></el-button>
+              <el-button
+                type="danger"
+                icon="el-icon-delete"
+                size="mini"
+                @click="deleteBookType1(scope.row.id)"
+              ></el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <div class="block">
+          <el-pagination
+            @size-change="handleSizeChange1"
+            @current-change="handleCurrentChange1"
+            :current-page="param1.pageNum"
+            :page-sizes="[1, 2, 5, 10]"
+            :page-size="param1.pageSize"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="total"
+          ></el-pagination>
+        </div>
+    </el-dialog>
+        <!--添加图书类别对话框-->
+    <el-dialog
+      title="添加类别名称"
+      :visible.sync="showaddDialog11"
+      width="30%"
+      :before-close="handleaddClose11"
+    >
+      <el-form :model="addBookTypeForm" ref="addBookTypeForm" label-width="80px">
+        <el-form-item label="类别名称">
+          <el-input v-model="addBookTypeForm.btName"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="canceladdUser11">取 消</el-button>
+        <el-button type="primary" @click="addBookType">确 认</el-button>
+      </span>
+    </el-dialog>
+    <!--修改图书类别对话框-->
+    <el-dialog
+      title="修改类别名称"
+      :visible.sync="showUpdateDialog11"
+      width="30%"
+      :before-close="handleUpdateClose11"
+    >
+      <el-form :model="updaterBookTypeForm" ref="updaterBookForm" label-width="80px">
+        <el-form-item label="id" disabled>
+          <el-input v-model="updaterBookTypeForm.id" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="类别名称">
+          <el-input v-model="updaterBookTypeForm.btName"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="cancelUpdateUser11">取 消</el-button>
+        <el-button type="primary" @click="updateBookType">确 认</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
 export default {
   data() {
     return {
+      updaterBookTypeForm:{},
+      showUpdateDialog11:false,
+      dialogTableVisible11:false,
+      addBookTypeForm: {
+        btName: ""
+      },
+      bookTypeList1: [],
+      total: 0,
       fileList: [],
       selFlag: false,
       param: {
@@ -238,6 +324,10 @@ export default {
         pageSize: 5,
         isCharge: "",
         bookTypeId: ""
+      },
+      param1: {
+        pageNum: 1,
+        pageSize: 2
       },
       addBookForm: {
         bookname: "",
@@ -251,12 +341,13 @@ export default {
       updaterBookForm: {
         bookUrl: "",
         bookResourceId: "",
-        isCharge: 0,
+        isCharge: 0
       },
       bookList: [],
       total: 0,
       showUpdateDialog: false,
       showAddDialog: false,
+      showaddDialog11:false,
       bookTypeList: [],
       bookTokenList: []
     };
@@ -265,6 +356,7 @@ export default {
     this.getBookList();
     this.getBookType();
     this.getBookTokenList();
+    this.getBookTypeList();
   },
   methods: {
     async getBookTokenList() {
@@ -394,6 +486,92 @@ export default {
     handleAddClose() {
       this.$refs.addBook.resetFields();
       this.showAddDialog = false;
+    },
+    // bookType
+    async getBookTypeList() {
+      const { data: res } = await this.$http.get(
+        `/book/book_type/${this.param1.pageNum}/${this.param1.pageSize}`
+      );
+      if (res.statusCode !== 200) {
+        return this.$message.error(res.message);
+      }
+      this.bookTypeList1 = res.data.list;
+      this.total = res.data.total;
+    },
+    async updateBookType() {
+      const { data: res } = await this.$http.put(
+        "/book/book_type",
+        this.updaterBookTypeForm
+      );
+      if (res.statusCode !== 200) {
+        return this.$message.error(res.message);
+      }
+      this.$message({
+        type: "success",
+        message: "更新成功",
+        duration: 2000
+      });
+      this.getBookTypeList();
+      this.showUpdateDialog11 = false;
+    },
+    async addBookType() {
+      const { data: res } = await this.$http.post(
+        "/book/book_type",
+        this.addBookTypeForm
+      );
+      if (res.statusCode !== 200) {
+        return this.$message.error(res.message);
+      }
+      this.$message({
+        type: "success",
+        message: "新增成功",
+        duration: 2000
+      });
+      this.getBookTypeList();
+      this.showaddDialog11 = false;
+    },
+    handleSizeChange1(size) {
+      this.param1.pageSize = size;
+      this.getBookTypeList();
+    },
+    handleCurrentChange1(pageNo) {
+      this.param1.pageNum = pageNo;
+      this.getBookTypeList();
+    },
+    async deleteBookType1(id) {
+      const { data: res } = await this.$http.delete(`/book/book_type/${id}`);
+      if (res.statusCode !== 200) {
+        return this.$message.error(res.message);
+      }
+      this.$message({
+        type: "success",
+        message: "删除图书类别成功",
+        duration: 2000
+      });
+      this.getBookTypeList();
+    },
+    updateUserDialog11(index, row) {
+      this.updaterBookTypeForm = row;
+      this.showUpdateDialog11 = true;
+    },
+    handleUpdateClose11() {
+      this.$refs.updaterBookForm.resetFields;  
+      this.showUpdateDialog11 = false;
+    },
+    cancelUpdateUser11() {
+      this.$refs.updaterBookForm.resetFields;
+      this.showUpdateDialog11 = false;     
+    },
+    updateaddDialog11() {
+      this.showaddDialog11 = true;
+    },
+    handleaddClose11() {
+      this.$refs.addBookTypeForm.resetFields;  
+      this.showaddDialog11 = false;
+    },
+    canceladdUser11() {
+      this.$refs.addBookTypeForm.resetFields;
+      this.showaddDialog11 = false;     
     }
   }
 };

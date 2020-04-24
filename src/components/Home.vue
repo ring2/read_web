@@ -14,11 +14,15 @@
           type="primary"
           @click="aboutMe"
           class="about-me"
-          style="margin-left: 900px;"
+          size="mini"
+          style="margin-left: 800px;"
           round
         >系统介绍</el-button>
-        <el-button type="info" @click="goPersonal" round>个人中心</el-button>
-        <el-button type="info" @click="loginOut" round>退出</el-button>
+        <el-badge :value="msgTotal">
+          <el-button type="info" size="mini" round @click="dialogTableVisible = true">消息中心</el-button>
+        </el-badge>
+        <el-button type="info" size="mini" @click="goPersonal" round>个人中心</el-button>
+        <el-button type="info" size="mini" @click="loginOut" round>退出</el-button>
       </el-header>
       <el-container>
         <!--左边菜单区域-->
@@ -64,12 +68,31 @@
     >
       <span>此系统为数字图书系统，系统分为管理端和用户端；此系统为管理端。</span>
     </el-drawer>
+    <el-dialog title="专家修改的书籍：" :visible.sync="dialogTableVisible">
+      <el-table :data="msgList">
+        <el-table-column type="index" label="#" width="50"></el-table-column>
+        <el-table-column property="bookId" label="书籍id" width="150"></el-table-column>
+        <el-table-column property="result" label="审核结果" width="200">
+          <template slot-scope="scope">{{scope.row.result == 0?"不通过":"通过"}}</template>
+        </el-table-column>
+        <el-table-column property="opinion" label="审核意见"></el-table-column>
+        <el-table-column label="操作">
+          <template slot-scope="scope">
+            <el-button type="info"  @click="updateRmdMsg(scope.row)">标为已读</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
   </div>
 </template>
 <script>
 export default {
   data() {
     return {
+      typeFlag: false,
+      dialogTableVisible: false,
+      msgTotal: 0,
+      msgList: [],
       menuList0: [
         {
           id: 1,
@@ -139,20 +162,20 @@ export default {
             }
           ]
         },
-        {
-          id: 22,
-          name: "借阅管理",
-          uri: "/borrow",
-          icon: "el-icon-menu",
-          children: [
-            {
-              id: 37,
-              name: "借阅情况",
-              uri: "/home/borrow",
-              icon: "el-icon-s-custom"
-            }
-          ]
-        },
+        // {
+        //   id: 22,
+        //   name: "借阅管理",
+        //   uri: "/borrow",
+        //   icon: "el-icon-menu",
+        //   children: [
+        //     {
+        //       id: 37,
+        //       name: "借阅情况",
+        //       uri: "/home/borrow",
+        //       icon: "el-icon-s-custom"
+        //     }
+        //   ]
+        // },
         {
           id: 23,
           name: "书卷管理",
@@ -235,14 +258,32 @@ export default {
     window.addEventListener("focus", this.handleWinFocus);
   },
   mounted() {
-    const userType = window.sessionStorage.getItem('userType')
-    if (userType === '管理员'){
-     this.menuList = this.menuList0
-    }else {
-     this.menuList = this.menuList1
+    this.getRmdTotal();
+    const userType = window.sessionStorage.getItem("userType");
+    if (userType === "管理员") {
+      this.menuList = this.menuList0;
+    } else {
+      this.menuList = this.menuList1;
     }
   },
   methods: {
+    async getRmdTotal() {
+      const { data: res } = await this.$http.get("/rmd_msg");
+      if (res.statusCode !== 200) {
+        return this.$message.error("查询失败");
+      }
+      this.msgList = res.data;
+      this.msgTotal = this.msgList.length;
+    },
+    async updateRmdMsg(obj) {
+      this.typeFlag = true;
+      const { data: res } = await this.$http.put("/rmd_msg", obj);
+      if (res.statusCode !== 200) {
+        return this.$message.error("标记失败");
+      }
+      this.$message.success("标记成功")
+      this.getRmdTotal()
+    },
     handleWinFocus() {
       document.title = "数字图书后台管理系统";
     },
@@ -316,6 +357,10 @@ export default {
 .el-button {
   background-color: #47aca1;
   border: 1px solid #fff;
+}
+.item {
+  background-color: #47aca1;
+  color: #fff;
 }
 .about-me {
   background-color: #47aca1;

@@ -10,10 +10,11 @@
       <el-button type="primary" @click="updateaddDialog">发布公告</el-button>
       <div>
         <!--图书类别列表区域-->
-        <el-table :data="bookTypeList" style="width: 60%" border stripe>
+        <el-table :data="bookTypeList" style="width: 85%" border stripe>
           <el-table-column type="index" label="#"></el-table-column>
           <el-table-column prop="annoTitle" label="公告标题" width="180"></el-table-column>
           <el-table-column prop="annoContent" label="公告内容" width="180"></el-table-column>
+          <el-table-column prop="attachUrl" label="附件url" width="280"></el-table-column>
           <el-table-column prop="annoPublishtime" label="发布时间" width="180">
             <template slot-scope="scope">
               <p>{{scope.row.annoPublishtime | formatDate}}</p>
@@ -41,7 +42,7 @@
             @size-change="handleSizeChange"
             @current-change="handleCurrentChange"
             :current-page="param.pageNum"
-            :page-sizes="[1, 2, 5, 10]"
+            :page-sizes="[1, 2, 5]"
             :page-size="param.pageSize"
             layout="total, sizes, prev, pager, next, jumper"
             :total="total"
@@ -86,6 +87,16 @@
         <el-form-item label="公告内容">
           <el-input v-model="addBookTypeForm.annoContent"></el-input>
         </el-form-item>
+        <el-form-item label="上传附件">
+          <el-upload
+            class="upload-demo"
+            action="http://localhost:8081/announce/upload"
+            :file-list="fileList"
+            :on-success="uploadSuccessUpdate"
+          >
+            <el-button size="small" type="primary">点击上传</el-button>
+          </el-upload>
+        </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="canceladdUser">取 消</el-button>
@@ -108,11 +119,13 @@ export default {
       addBookTypeForm: {
         annoTitle:'',
         annoContent:'',
+        attachUrl:''
       },
       bookTypeList: [],
       total: 0,
       showUpdateDialog: false,
-      showaddDialog: false
+      showaddDialog: false,
+      fileList: [],
     };
   },
   filters: {
@@ -127,6 +140,10 @@ export default {
     this.getBookTypeList();
   },
   methods: {
+    uploadSuccessUpdate(response, file, fileList) {
+      console.log(response)
+      this.addBookTypeForm.attachUrl = response.data;
+    },
     async getBookTypeList() {
       const param = this.param;
       if(param.title==''){
