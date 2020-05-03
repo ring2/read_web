@@ -52,7 +52,7 @@
               placeholder="请输入用户名"
             ></el-input>
           </el-form-item>
-          <el-form-item prop="password" style="margin-top:34px">
+          <el-form-item prop="password" style="margin-top:20px">
             <el-input
               prefix-icon="el-icon-lock"
               v-model="registerForm.exPwd"
@@ -60,26 +60,35 @@
               show-password
             ></el-input>
           </el-form-item>
-          <el-form-item prop="name" style="margin-top:34px">
+          <el-form-item prop="name" style="margin-top:20px">
             <el-input prefix-icon="el-icon-edit" v-model="registerForm.exName" placeholder="请输入姓名"></el-input>
           </el-form-item>
-          <el-form-item prop="exPhone" style="margin-top:34px">
-            <el-input prefix-icon="el-icon-edit" v-model="registerForm.exPhone" placeholder="请输入手机号"></el-input>
+          <el-form-item prop="exPhone" style="margin-top:20px">
+            <el-input
+              prefix-icon="el-icon-edit"
+              v-model="registerForm.exPhone"
+              placeholder="请输入手机号"
+            ></el-input>
           </el-form-item>
-          <el-form-item prop="exAddr" style="margin-top:34px">
+          <el-form-item prop="exAddr" style="margin-top:20px">
             <el-input prefix-icon="el-icon-edit" v-model="registerForm.exAddr" placeholder="请输入地址"></el-input>
           </el-form-item>
-          <el-form-item >
-          <el-select v-model="registerForm.exTypeId" placeholder="请选择专家类别">
-            <el-option
-              v-for="(item,index) in expertTypeList"
-              :key="index"
-              :label="item.etName"
-              :value="item.id"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-          <el-form-item prop="identity" style="margin-top:34px">
+          <el-form-item label="擅长的书籍分类:">
+            <el-checkbox-group v-model="bookTypeList1" >
+              <el-checkbox v-for="(item,index) in bookTypeList" :key="index" :label="item.btName" name="index" @change="checkBookType(item.id)"></el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
+          <el-form-item>
+            <el-select v-model="registerForm.exTypeId" placeholder="请选择专家类别">
+              <el-option
+                v-for="(item,index) in expertTypeList"
+                :key="index"
+                :label="item.etName"
+                :value="item.id"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item prop="identity" style="margin-top:20px">
             <el-input
               prefix-icon="el-icon-user"
               v-model="registerForm.exIdentity"
@@ -99,6 +108,9 @@
 export default {
   data() {
     return {
+      bookTypeList:[],
+      bookTypeList1:[],
+      bookTypeResult:[],
       registerFlag: false,
       img: "",
       loginForm: {
@@ -113,9 +125,10 @@ export default {
         exPwd: "",
         exName: "",
         exPhone: "",
-        exAddr:"",
-        exTypeId:"",
-        exIdentity: ""
+        exAddr: "",
+        exTypeId: "",
+        exIdentity: "",
+        bookTypes:""
       },
       loginRules: {
         username: [
@@ -129,13 +142,21 @@ export default {
         result: [{ required: true, message: "请输入验证码", trigger: "blur" }]
       },
       loading: false,
-      expertTypeList:[]
+      expertTypeList: []
     };
   },
   created() {
     this.getCaptcha();
+    this.getBookTypes();
   },
   methods: {
+    async getBookTypes() {
+      const{data:res} = await this.$http.get('/book/book_type')
+      this.bookTypeList = res.data;
+    },
+    checkBookType(item) {
+      this.bookTypeResult.push(item)
+    },
     resetForm() {
       this.$refs.loginFormRef.resetFields();
     },
@@ -154,6 +175,7 @@ export default {
       this.expertTypeList = res.data;
     },
     async register() {
+      this.registerForm.bookTypes = this.bookTypeResult.toString()
       const { data: res } = await this.$http.post(
         "/register",
         this.registerForm
@@ -179,7 +201,7 @@ export default {
           message: "登录成功",
           duration: 2000
         });
-       const user = JSON.stringify(res.data.user);
+        const user = JSON.stringify(res.data.user);
         window.sessionStorage.setItem("user", user);
         window.sessionStorage.setItem("userType", res.data.userType);
         this.$router.push("/home");
@@ -252,5 +274,8 @@ export default {
 .btns {
   display: flex;
   justify-content: flex-end;
+}
+.formfont {
+  font-size: 8px !important;
 }
 </style>

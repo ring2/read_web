@@ -3,7 +3,7 @@
     <!--面包屑-->
     <el-breadcrumb separator-class="el-icon-arrow-right" class="breadcrumb">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>专家管理</el-breadcrumb-item>
+      <el-breadcrumb-item>专家中心</el-breadcrumb-item>
       <el-breadcrumb-item>推荐审核</el-breadcrumb-item>
     </el-breadcrumb>
     <el-card shadow="hover">
@@ -12,62 +12,132 @@
           <el-col :span="4">
             <div style="margin-top: 13px;">
               <el-button
-                :type="isReview==='info'?'success':'info'"
+                :type="isReview==='danger'?'info':'danger'"
                 @click="showReviewRecommend"
               >已审核的书籍</el-button>
             </div>
           </el-col>
           <el-col :span="6">
             <div style="margin-top: 13px;">
-              <el-button :type="isReview" @click="showNoReviewRecommend">未审核的书籍</el-button>
+              <el-button :type="isReview" @click="showNoReviewRecommend">待审核的书籍</el-button>
             </div>
           </el-col>
         </el-row>
         <!--用户列表区域-->
-        <el-table :data="recommendList" :style="option?'width: 50%':'width: 100%'" border stripe>
-          <el-table-column type="index" label="#"></el-table-column>
-          <el-table-column prop="reReaderid" label="读者id" width="180"></el-table-column>
-          <el-table-column prop="reBookid" label="审核书id" width="180"></el-table-column>
-          <el-table-column prop="reResult" label="审核结果" v-if="!option">
-            <template v-slot="scope">
-              <span>{{scope.row.reResult == 0?'不通过':'通过'}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="reOpinion" label="审核意见" v-if="!option"></el-table-column>
-          <el-table-column label="操作">
-            <template slot-scope="scope">
-              <el-button type="primary" size="mini" v-show="option" @click="read(scope.row)">阅读书籍</el-button>
-              <el-button
-                type="primary"
-                size="mini"
-                v-show="!option"
-                @click="updateRecommend1(scope.row)"
-              >编辑</el-button>
-              <el-button
-                type="danger"
-                size="mini"
-                v-show="!option"
-                @click="delRecommend(scope.row)"
-              >删除</el-button>
-              <el-button
-                type="primary"
-                size="mini"
-                v-show="option"
-                @click="reviewResult(scope.row)"
-              >评判</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-        <div class="block">
-          <el-pagination
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-            :current-page="param.pageNum"
-            :page-sizes="[1, 2, 5, 10]"
-            :page-size="param.pageSize"
-            layout="total, sizes, prev, pager, next, jumper"
-            :total="total"
-          ></el-pagination>
+        <div v-show="option">
+          <el-table :data="recommendList" :style="option?'width: 50%':'width: 100%'" border stripe>
+            <el-table-column type="index" label="#"></el-table-column>
+            <el-table-column prop="username" label="推荐用户" width="180"></el-table-column>
+            <el-table-column prop="bookname" label="书籍名称" width="180"></el-table-column>
+            <el-table-column prop="reResult" label="审核结果" v-if="!option">
+              <template v-slot="scope">
+                <span>{{scope.row.reResult == 0?'不通过':'通过'}}</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="reOpinion" label="审核意见" v-if="!option"></el-table-column>
+            <el-table-column label="操作">
+              <template slot-scope="scope">
+                <el-button type="primary" size="mini" v-show="option" @click="read(scope.row)">阅读书籍</el-button>
+                <el-button
+                  type="primary"
+                  size="mini"
+                  v-show="!option"
+                  @click="updateRecommend1(scope.row)"
+                >编辑</el-button>
+                <el-button
+                  type="danger"
+                  size="mini"
+                  v-show="!option"
+                  @click="delRecommend(scope.row)"
+                >删除</el-button>
+                <el-button
+                  type="primary"
+                  size="mini"
+                  v-show="option"
+                  @click="reviewResult(scope.row)"
+                >评判</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+          <div class="block">
+            <el-pagination
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+              :current-page="param.pageNum"
+              :page-sizes="[1, 2, 5, 10]"
+              :page-size="param.pageSize"
+              layout="total, sizes, prev, pager, next, jumper"
+              :total="total"
+            ></el-pagination>
+          </div>
+        </div>
+        <!--已审核通过-->
+        <div v-show="!option">
+          <el-tag class="eltag">审核通过:</el-tag>
+          <el-table
+            :data="yesRecommendList"
+            :style="option?'width: 50%':'width: 100%'"
+            border
+            stripe
+          >
+            <el-table-column type="index" label="#"></el-table-column>
+            <el-table-column prop="username" label="用户名"></el-table-column>
+            <el-table-column prop="bookname" label="书名"></el-table-column>
+            <el-table-column prop="bookauthor" label="作者"></el-table-column>
+            <el-table-column prop="bookPress" label="出版社"></el-table-column>
+            <el-table-column prop="pressTime" label="出版日期">
+              <template slot-scope="scope">
+                <p>{{scope.row.pressTime | formatDate}}</p>
+              </template>
+            </el-table-column>
+            <el-table-column prop="shortIntro" label="简介"></el-table-column>
+            <el-table-column prop="bookreadnum" label="阅读量"></el-table-column>
+          </el-table>
+          <!-- <div class="block">
+            <el-pagination
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+              :current-page="param.pageNum"
+              :page-sizes="[1, 2, 5, 10]"
+              :page-size="param.pageSize"
+              layout="total, sizes, prev, pager, next, jumper"
+              :total="total"
+            ></el-pagination>
+          </div>-->
+        </div>
+        <!--已审核未通过-->
+        <div v-show="!option">
+          <el-tag class="eltag">审核未通过:</el-tag>
+          <el-table
+            :data="noRecommendList"
+            :style="option?'width: 50%':'width: 100%'"
+            border
+            stripe
+          >
+            <el-table-column type="index" label="#"></el-table-column>
+            <el-table-column prop="username" label="推荐用户"></el-table-column>
+            <el-table-column prop="bookname" label="书名"></el-table-column>
+            <el-table-column prop="bookauthor" label="作者"></el-table-column>
+            <el-table-column prop="bookPress" label="出版社"></el-table-column>
+            <el-table-column prop="pressTime" label="出版日期">
+              <template slot-scope="scope">
+                <p>{{scope.row.pressTime | formatDate}}</p>
+              </template>
+            </el-table-column>
+            <el-table-column prop="shortIntro" label="简介"></el-table-column>
+            
+          </el-table>
+          <!-- <div class="block">
+            <el-pagination
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+              :current-page="param.pageNum"
+              :page-sizes="[1, 2, 5, 10]"
+              :page-size="param.pageSize"
+              layout="total, sizes, prev, pager, next, jumper"
+              :total="total"
+            ></el-pagination>
+          </div>-->
         </div>
       </div>
     </el-card>
@@ -79,11 +149,11 @@
       :before-close="handleUpdateClose"
     >
       <el-form :model="updateRecommendForm" ref="updaterUserForm" label-width="80px">
-        <el-form-item label="读者id" disabled>
-          <el-input v-model="updateRecommendForm.reReaderid" disabled></el-input>
+        <el-form-item label="推荐用户" disabled>
+          <el-input v-model="updateRecommendForm.username" disabled></el-input>
         </el-form-item>
-        <el-form-item label="书籍id" disabled>
-          <el-input v-model="updateRecommendForm.reBookid" disabled></el-input>
+        <el-form-item label="书籍名称" disabled>
+          <el-input v-model="updateRecommendForm.bookname" disabled></el-input>
         </el-form-item>
         <el-form-item label="审核结果">
           <el-select v-model="updateRecommendForm.reResult" placeholder="请选择审核结果">
@@ -126,11 +196,12 @@
   </div>
 </template>
 <script>
+import dateFormat from "../../assets/js/Date";
 export default {
   data() {
     return {
       option: false,
-      isReview: "success",
+      isReview: "info",
       param: {
         reStatus: 1,
         pageNum: 1,
@@ -146,17 +217,39 @@ export default {
         reStatus: "",
         type: 0
       },
-      updateRecommendForm1:{},
+      updateRecommendForm1: {},
       recommendList: [],
+      noRecommendList: [],
+      yesRecommendList: [],
       total: 0,
       showUpdateDialog: false,
       showUpdateDialog1: false
     };
   },
+  filters: {
+    formatDate(time) {
+      if (time) {
+        let date = new Date(time);
+        return dateFormat.formatDate(date, "yyyy.MM.dd");
+      }
+    }
+  },
   created() {
     this.getRecommendList();
+    this.getReviewedList();
   },
   methods: {
+    async getReviewedList() {
+      const user = JSON.parse(window.sessionStorage.getItem("user"));
+      const { data: res } = await this.$http.get(
+        `/recommend/reviewed/${user.id}`
+      );
+      if (res.statusCode !== 200) {
+        return this.$message.error(res.message);
+      }
+      this.yesRecommendList = res.data.passBooks;
+      this.noRecommendList = res.data.noPassBooks;
+    },
     updateRecommend1(row) {
       this.showUpdateDialog1 = true;
       this.updateRecommendForm1 = row;
@@ -256,13 +349,13 @@ export default {
       this.getRecommendList();
     },
     showNoReviewRecommend() {
-      this.isReview = "info";
+      this.isReview = "danger";
       this.option = true;
       this.param.reStatus = 0;
       this.getRecommendList();
     },
     showReviewRecommend() {
-      this.isReview = "success";
+      this.isReview = "info";
       this.option = false;
       this.param.reStatus = 1;
       this.getRecommendList();
@@ -314,4 +407,7 @@ export default {
 };
 </script>
 <style scoped>
+.eltag {
+  margin-top: 15px;
+}
 </style>

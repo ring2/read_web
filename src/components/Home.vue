@@ -142,7 +142,7 @@ export default {
             },
             {
               id: 659,
-              name: "已审核书籍",
+              name: "图书推荐管理",
               uri: "/home/reviewed",
               icon: "el-icon-menu"
             }

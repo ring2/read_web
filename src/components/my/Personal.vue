@@ -141,7 +141,6 @@ export default {
   },
   mounted() {
     this.userType = window.sessionStorage.getItem("userType");
-    console.log(window.sessionStorage.getItem("user"));
     if (this.userType === "管理员") {
       this.adminFrom = JSON.parse(window.sessionStorage.getItem("user"));
     } else {
