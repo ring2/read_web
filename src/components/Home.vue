@@ -8,7 +8,7 @@
             src="../assets/book.png"
             style="height:60px; width:60px;border-radius:50%;margin-left:12px"
           />
-          <span style="width:200px">数字图书管理系统</span>
+          <span style="width:200px">Tutor-IT图书管理系统</span>
         </div>
         <el-button
           type="primary"
@@ -61,12 +61,12 @@
     </el-container>
     <!--关于我的展示-->
     <el-drawer
-      title="数字图书管理系统"
+      title="Tutor-IT管理系统"
       :visible.sync="drawer"
       :direction="direction"
       :before-close="handleClose"
     >
-      <span>此系统为数字图书系统，系统分为管理端和用户端；此系统为管理端。</span>
+      <span>此系统为Tutor-IT图书系统。</span>
     </el-drawer>
     <el-dialog title="专家修改的书籍：" :visible.sync="dialogTableVisible">
       <el-table :data="msgList">
@@ -285,7 +285,7 @@ export default {
       this.getRmdTotal()
     },
     handleWinFocus() {
-      document.title = "数字图书后台管理系统";
+      document.title = "Tutor-IT管理系统";
     },
     handleWinBlur() {
       document.title = "我一定会回来的！";

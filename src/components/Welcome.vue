@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <el-carousel :interval="1600" type="card" height="300px">
-      <el-carousel-item v-for="(item) in 4" :key="item">
+      <el-carousel-item v-for="(item) in 6" :key="item">
         <!-- <h3 class="medium">{{ item }}</h3> -->
         <!-- <img src="../assets/img/1212.jpg" style="width: 648px" /> -->
         {{carouselData[item-1]}}
@@ -10,7 +10,7 @@
     <div class="tian"></div>
     <div class="tiana">
       <div>
-        <el-alert title="@毕业设计作品：李真" type="info" style="margin-top:400px;height:30px" :closable="false" center show-icon></el-alert>
+        <el-alert title="@毕业设计作品：魏全全" type="info" style="margin-top:400px;height:30px" :closable="false" center show-icon></el-alert>
       </div>
     </div>
   </div>
@@ -19,7 +19,7 @@
 export default {
   data() {
     return {
-      carouselData: ['欢', '迎', '光', '临']
+      carouselData: ['河', '南', '工', '业','大','学']
     }
   },
   methods: {}
