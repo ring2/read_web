@@ -25,10 +25,18 @@
         </el-row>
         <!--用户列表区域-->
         <div v-show="option">
-          <el-table :data="recommendList" :style="option?'width: 50%':'width: 100%'" border stripe>
+          <el-table :data="recommendList" :style="option?'width: 100%':'width: 100%'" border stripe>
             <el-table-column type="index" label="#"></el-table-column>
-            <el-table-column prop="username" label="推荐用户" width="180"></el-table-column>
-            <el-table-column prop="bookname" label="书籍名称" width="180"></el-table-column>
+            <el-table-column prop="username" label="推荐用户" ></el-table-column>
+            <el-table-column prop="bookname" label="书籍名称"></el-table-column>
+            <el-table-column prop="bookPress" label="出版社"></el-table-column>
+            <el-table-column prop="pressTime" label="出版日期">
+              <template slot-scope="scope">
+                <p>{{scope.row.pressTime | formatDate}}</p>
+              </template>
+            </el-table-column>
+            <el-table-column prop="shortIntro" label="简介"></el-table-column>
+            <el-table-column prop="reReason" label="推荐理由"></el-table-column>
             <el-table-column prop="reResult" label="审核结果" v-if="!option">
               <template v-slot="scope">
                 <span>{{scope.row.reResult == 0?'不通过':'通过'}}</span>
@@ -92,6 +100,7 @@
             </el-table-column>
             <el-table-column prop="shortIntro" label="简介"></el-table-column>
             <el-table-column prop="bookreadnum" label="阅读量"></el-table-column>
+            <el-table-column prop="reOpinion" label="审核意见"></el-table-column>
           </el-table>
           <!-- <div class="block">
             <el-pagination
@@ -125,6 +134,7 @@
               </template>
             </el-table-column>
             <el-table-column prop="shortIntro" label="简介"></el-table-column>
+            <el-table-column prop="reOpinion" label="审核意见"></el-table-column>
             
           </el-table>
           <!-- <div class="block">
@@ -278,6 +288,7 @@ export default {
       if (res.statusCode !== 200) {
         return this.$message.error(res.message);
       }
+      this.getReviewedList();
       this.$message({
         type: "success",
         message: "已提交审核意见",
@@ -362,8 +373,9 @@ export default {
     },
     async getRecommendList() {
       const param = this.param;
+      const user = JSON.parse(window.sessionStorage.getItem("user"));
       const { data: res } = await this.$http.get(
-        `/recommend/list/${param.reStatus}/${param.pageNum}/${param.pageSize}`
+        `/recommend/list/${param.reStatus}/${user.id}/${param.pageNum}/${param.pageSize}`
       );
       if (res.statusCode !== 200) {
         return this.$message.error(res.message);

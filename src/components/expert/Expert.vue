@@ -27,12 +27,14 @@
           <el-table-column prop="exName" label="姓名" width="180"></el-table-column>
           <el-table-column prop="exIdentity" label="身份证号"></el-table-column>
           <el-table-column prop="expertType" label="专家类别"></el-table-column>
-          <el-table-column prop="isReview" label="审核结果">
+          <el-table-column prop="companyAddress" label="工作单位"></el-table-column>
+          <el-table-column prop="jobTitle" label="职称"></el-table-column>
+          <el-table-column v-if="!option" prop="isReview" label="审核结果">
             <template slot-scope="scope">
               {{scope.row.isReview == 1?'审核通过':'审核未通过'}}
             </template>
           </el-table-column>
-          <el-table-column label="操作">
+          <el-table-column label="操作" width="220">
             <template slot-scope="scope">
               <el-button
                 type="danger"
