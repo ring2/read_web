@@ -18,7 +18,7 @@
           style="margin-left: 800px;"
           round
         >系统介绍</el-button>
-        <el-badge :value="msgTotal">
+        <el-badge :value="msgTotal" v-if="showMessageCenter">
           <el-button type="info" size="mini" round @click="dialogTableVisible = true">消息中心</el-button>
         </el-badge>
         <el-button type="info" size="mini" @click="goPersonal" round>个人中心</el-button>
@@ -71,14 +71,17 @@
     <el-dialog title="专家修改的书籍：" :visible.sync="dialogTableVisible">
       <el-table :data="msgList">
         <el-table-column type="index" label="#" width="50"></el-table-column>
-        <el-table-column property="bookId" label="书籍id" width="150"></el-table-column>
-        <el-table-column property="result" label="审核结果" width="200">
+        <el-table-column property="bookName" label="书籍名称" ></el-table-column>
+        <el-table-column property="username" label="推荐用户" ></el-table-column>
+        <el-table-column property="expertName" label="专家姓名" ></el-table-column>
+        <el-table-column property="bookType" label="图书类别" ></el-table-column>
+        <el-table-column property="result" label="审核结果" >
           <template slot-scope="scope">{{scope.row.result == 0?"不通过":"通过"}}</template>
         </el-table-column>
         <el-table-column property="opinion" label="审核意见"></el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
-            <el-button type="info"  @click="updateRmdMsg(scope.row)">标为已读</el-button>
+            <el-button type="info" size="mini"  @click="updateRmdMsg(scope.row)">标为已读</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -89,6 +92,7 @@
 export default {
   data() {
     return {
+      showMessageCenter:false,
       typeFlag: false,
       dialogTableVisible: false,
       msgTotal: 0,
@@ -262,8 +266,10 @@ export default {
     const userType = window.sessionStorage.getItem("userType");
     if (userType === "管理员") {
       this.menuList = this.menuList0;
+      this.showMessageCenter = true;
     } else {
       this.menuList = this.menuList1;
+      this.showMessageCenter = false
     }
   },
   methods: {

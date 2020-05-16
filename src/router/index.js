@@ -13,6 +13,10 @@ const routes = [
     component: () => import('@/components/Login')
   },
   {
+    path: '/video',
+    component: () => import('@/components/my/Video')
+  },
+  {
     path: '/user',
     component: () => import('@/components/user/User.vue')
   },

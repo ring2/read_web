@@ -26,7 +26,11 @@
             <el-button type="primary" style="margin-top: 5px;" @click="addBookDialog()">添加图书</el-button>
           </el-col>
           <el-col :span="2">
-            <el-button type="primary" style="margin-top: 5px;" @click="dialogTableVisible11=true">书籍分类</el-button>
+            <el-button
+              type="primary"
+              style="margin-top: 5px;"
+              @click="dialogTableVisible11=true"
+            >书籍分类</el-button>
           </el-col>
           <el-col :span="2">
             <el-button type="primary" style="margin-top: 5px;" @click="showaddDialog11=true">添加分类</el-button>
@@ -60,8 +64,15 @@
         <!--图书列表区域-->
         <el-table :data="bookList" style="width: 100%" border stripe>
           <el-table-column type="index" label="#"></el-table-column>
-          <el-table-column prop="bookname" label="书籍名称" width="180"></el-table-column>
-          <el-table-column prop="bookauthor" label="作者" width="180"></el-table-column>
+          <el-table-column prop="bookname" label="书籍名称"></el-table-column>
+          <el-table-column prop="bookauthor" label="作者"></el-table-column>
+          <el-table-column prop="bookPress" label="出版社"></el-table-column>
+          <el-table-column prop="pressTime" label="出版日期">
+            <template slot-scope="scope">
+              <p>{{scope.row.pressTime | formatDate}}</p>
+            </template>
+          </el-table-column>
+          <el-table-column prop="shortIntro" label="简介"></el-table-column>
           <el-table-column prop="bookreadnum" label="阅读数量"></el-table-column>
           <el-table-column prop="isCharge" label="是否收费">
             <template v-slot="scope">
@@ -138,6 +149,20 @@
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
         </el-form-item>
+              <el-form-item label="出版社">
+        <el-input v-model="updaterBookForm.bookPress"></el-input>
+      </el-form-item>
+      <el-form-item label="出版日期">
+        <el-date-picker
+          type="date"
+          placeholder="选择日期"
+          v-model="updaterBookForm.pressTime"
+          style="width: 100%;"
+        ></el-date-picker>
+      </el-form-item>
+      <el-form-item label="简介">
+        <el-input v-model="updaterBookForm.shortIntro"></el-input>
+      </el-form-item>
         <el-form-item label="阅读数量">
           <el-input v-model="updaterBookForm.bookreadnum"></el-input>
         </el-form-item>
@@ -187,6 +212,20 @@
         <el-form-item label="作者">
           <el-input v-model="addBookForm.bookauthor"></el-input>
         </el-form-item>
+        <el-form-item label="出版社">
+          <el-input v-model="addBookForm.bookPress"></el-input>
+        </el-form-item>
+        <el-form-item label="出版日期">
+          <el-date-picker
+            type="date"
+            placeholder="选择日期"
+            v-model="addBookForm.pressTime"
+            style="width: 100%;"
+          ></el-date-picker>
+        </el-form-item>
+        <el-form-item label="简介">
+          <el-input v-model="addBookForm.shortIntro"></el-input>
+        </el-form-item>
         <el-form-item label="上传图书资源">
           <el-upload
             class="upload-demo"
@@ -232,39 +271,39 @@
     <!--图书类别-->
     <el-dialog title="书籍类别列表" :visible.sync="dialogTableVisible11">
       <!--图书类别列表区域-->
-        <el-table :data="bookTypeList1" style="width: 60%" border stripe>
-          <el-table-column type="index" label="#"></el-table-column>
-          <el-table-column prop="btName" label="类别名称" width="180"></el-table-column>
-          <el-table-column label="操作">
-            <template slot-scope="scope">
-              <el-button
-                type="primary"
-                icon="el-icon-edit"
-                size="mini"
-                @click="updateUserDialog11(scope.$index, scope.row)"
-              ></el-button>
-              <el-button
-                type="danger"
-                icon="el-icon-delete"
-                size="mini"
-                @click="deleteBookType1(scope.row.id)"
-              ></el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-        <div class="block">
-          <el-pagination
-            @size-change="handleSizeChange1"
-            @current-change="handleCurrentChange1"
-            :current-page="param1.pageNum"
-            :page-sizes="[1, 2, 5, 10]"
-            :page-size="param1.pageSize"
-            layout="total, sizes, prev, pager, next, jumper"
-            :total="total"
-          ></el-pagination>
-        </div>
+      <el-table :data="bookTypeList1" style="width: 60%" border stripe>
+        <el-table-column type="index" label="#"></el-table-column>
+        <el-table-column prop="btName" label="类别名称" width="180"></el-table-column>
+        <el-table-column label="操作">
+          <template slot-scope="scope">
+            <el-button
+              type="primary"
+              icon="el-icon-edit"
+              size="mini"
+              @click="updateUserDialog11(scope.$index, scope.row)"
+            ></el-button>
+            <el-button
+              type="danger"
+              icon="el-icon-delete"
+              size="mini"
+              @click="deleteBookType1(scope.row.id)"
+            ></el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div class="block">
+        <el-pagination
+          @size-change="handleSizeChange1"
+          @current-change="handleCurrentChange1"
+          :current-page="param1.pageNum"
+          :page-sizes="[1, 2, 5, 10]"
+          :page-size="param1.pageSize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="total"
+        ></el-pagination>
+      </div>
     </el-dialog>
-        <!--添加图书类别对话框-->
+    <!--添加图书类别对话框-->
     <el-dialog
       title="添加类别名称"
       :visible.sync="showaddDialog11"
@@ -304,12 +343,13 @@
   </div>
 </template>
 <script>
+import dateFormat from "../../assets/js/Date";
 export default {
   data() {
     return {
-      updaterBookTypeForm:{},
-      showUpdateDialog11:false,
-      dialogTableVisible11:false,
+      updaterBookTypeForm: {},
+      showUpdateDialog11: false,
+      dialogTableVisible11: false,
       addBookTypeForm: {
         btName: ""
       },
@@ -336,7 +376,10 @@ export default {
         bookUrl: "",
         bookTokenId: "",
         isCharge: 0,
-        bookResourceId: ""
+        bookResourceId: "",
+        bookPress: "",
+        pressTime: "",
+        shortIntro: ""
       },
       updaterBookForm: {
         bookUrl: "",
@@ -347,7 +390,7 @@ export default {
       total: 0,
       showUpdateDialog: false,
       showAddDialog: false,
-      showaddDialog11:false,
+      showaddDialog11: false,
       bookTypeList: [],
       bookTokenList: []
     };
@@ -397,6 +440,7 @@ export default {
       if (res.statusCode !== 200) {
         return this.$message.error(res.message);
       }
+      this.$message.success("新增书籍成功");
       this.getBookList();
       this.showAddDialog = false;
     },
@@ -555,23 +599,31 @@ export default {
       this.showUpdateDialog11 = true;
     },
     handleUpdateClose11() {
-      this.$refs.updaterBookForm.resetFields;  
+      this.$refs.updaterBookForm.resetFields;
       this.showUpdateDialog11 = false;
     },
     cancelUpdateUser11() {
       this.$refs.updaterBookForm.resetFields;
-      this.showUpdateDialog11 = false;     
+      this.showUpdateDialog11 = false;
     },
     updateaddDialog11() {
       this.showaddDialog11 = true;
     },
     handleaddClose11() {
-      this.$refs.addBookTypeForm.resetFields;  
+      this.$refs.addBookTypeForm.resetFields;
       this.showaddDialog11 = false;
     },
     canceladdUser11() {
       this.$refs.addBookTypeForm.resetFields;
-      this.showaddDialog11 = false;     
+      this.showaddDialog11 = false;
+    }
+  },
+  filters: {
+    formatDate(time) {
+      if (time) {
+        let date = new Date(time);
+        return dateFormat.formatDate(date, "yyyy.MM.dd");
+      }
     }
   }
 };
