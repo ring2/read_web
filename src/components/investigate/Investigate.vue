@@ -28,8 +28,8 @@
 
         <el-col :span="12">
           <div v-for="(item,index) in result1" :key="index">
-              <h4>{{item.question}}</h4>
-              <span>🔍：该问卷一共{{item.peopleNum}}人参与，平均分：{{item.avg}},最高分：{{item.max}},最低分：{{item.min}}</span>
+            <div><h4 style="width:200px;display: inline-block">{{item.question}}</h4><span @click="deleteQuestion(item.id)" class="el-icon-delete" style="margin-left:200px;positon:absolute;color:red;cursor:pointer;"></span><br></div>
+            <span>🔍：该问卷一共{{item.avg==null?0:item.peopleNum}}人参与，平均分：{{item.avg==null?0:item.avg}},最高分：{{item.avg==null?0:item.max}},最低分：{{item.avg==null?0:item.min}}</span>
           </div>
         </el-col>
       </el-row>
@@ -44,7 +44,6 @@
         </el-form-item>
         <el-form-item label="问题类型">
           <el-radio-group v-model="newInvestigate.questionType">
-            <el-radio label="问答题"></el-radio>
             <el-radio label="单选题(1-5分进行选择）"></el-radio>
           </el-radio-group>
         </el-form-item>
@@ -67,14 +66,23 @@ export default {
         question: "",
         questionType: "问答题"
       },
-      result1:[]
+      result1: []
     };
   },
   created() {
-    this.getSituation();
+    // this.getSituation();
     this.getSituation1();
   },
   methods: {
+    async deleteQuestion(id) {
+      console.log(id);
+      const {data:res} = await this.$http.delete(`/investigate/${id}`)
+      if (res.statusCode !== 200) {
+        return this.$message.error(res.message)
+      }
+      this.getSituation1();
+      this.$message.success('删除成功')
+    },
     handleClose1() {
       this.dialogVisible = false;
       this.newInvestigate = {
@@ -116,7 +124,7 @@ export default {
       if (res.statusCode !== 200) {
         return this.$message.error(res.message);
       }
-      this.getSituation();
+      this.getSituation1()
       this.dialogVisible = false;
       this.$refs.form.resetFields();
       this.$message.success("发布成功!");

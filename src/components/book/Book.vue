@@ -64,24 +64,39 @@
         <!--图书列表区域-->
         <el-table :data="bookList" style="width: 100%" border stripe>
           <el-table-column type="index" label="#"></el-table-column>
-          <el-table-column prop="bookname" label="书籍名称"></el-table-column>
-          <el-table-column prop="bookauthor" label="作者"></el-table-column>
-          <el-table-column prop="bookPress" label="出版社"></el-table-column>
-          <el-table-column prop="pressTime" label="出版日期">
+          <el-table-column prop="bookname" label="书籍名称" width="120">
             <template slot-scope="scope">
-              <p>{{scope.row.pressTime | formatDate}}</p>
+              <p style="color:deepskyblue;cursor:pointer" @click="handlePdf(scope.row.bookUrl)">{{scope.row.bookname}}</p>
             </template>
           </el-table-column>
-          <el-table-column prop="shortIntro" label="简介"></el-table-column>
-          <el-table-column prop="bookreadnum" label="阅读数量"></el-table-column>
+          <el-table-column label="书籍图片" width="120">
+            <template slot-scope="scope">
+              <img
+                :src="scope.row.pictureurl"
+                width="100px"
+                height="80px"
+                alt="暂无图片"
+              />
+            </template>
+          </el-table-column>
+          <el-table-column prop="bookauthor" label="作者" width="120"></el-table-column>
+          <el-table-column prop="bookPress" label="出版社" width="120"></el-table-column>
+          <el-table-column prop="pressTime" label="出版日期" width="120">
+            <template slot-scope="scope">
+              <p>{{scope.row.createTime | formatDate}}</p>
+            </template>
+          </el-table-column>
+          <el-table-column prop="bookIntroduction" label="简介" width="150"></el-table-column>
+          <el-table-column prop="bookreadnum" label="阅读数量" width="120"></el-table-column>
+          <el-table-column prop="bookcredit" label="积分" width="100"></el-table-column>
           <el-table-column prop="isCharge" label="是否收费">
             <template v-slot="scope">
               <span>{{scope.row.isCharge == 1?'收费':'免费'}}</span>
             </template>
           </el-table-column>
-          <el-table-column v-if="!selFlag" prop="btname" label="书籍类别"></el-table-column>
+          <el-table-column v-if="!selFlag" prop="bookType" label="书籍类别" width="100"></el-table-column>
           <span v-if="selFlag">
-            <el-table-column prop="bookTypeId" label="书籍类别">
+            <el-table-column prop="bookTypeId" label="书籍类别" width="100">
               <template v-slot="scope">
                 <span v-for="(item,index) in bookTypeList" :key="index">
                   <span v-if="item.id == scope.row.bookTypeId">{{item.btName}}</span>
@@ -90,12 +105,12 @@
             </el-table-column>
           </span>
 
-          <el-table-column prop="bookShelves" label="是否上架">
+          <el-table-column prop="bookShelves" label="是否上架" width="100">
             <template v-slot="scope">
               <span>{{scope.row.bookShelves == 0?'未上架':'已上架'}}</span>
             </template>
           </el-table-column>
-          <el-table-column label="操作">
+          <el-table-column label="操作" fixed="right" width="200">
             <template slot-scope="scope">
               <el-button
                 type="primary"
@@ -114,10 +129,10 @@
         </el-table>
         <div class="block">
           <el-pagination
-            @size-change="handleSizeChange1"
-            @current-change="handleCurrentChange1"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
             :current-page="param.pageNum"
-            :page-sizes="[1, 2, 5, 6]"
+            :page-sizes="[1, 2, 3, 4]"
             :page-size="param.pageSize"
             layout="total, sizes, prev, pager, next, jumper"
             :total="total"
@@ -149,20 +164,20 @@
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
         </el-form-item>
-              <el-form-item label="出版社">
-        <el-input v-model="updaterBookForm.bookPress"></el-input>
-      </el-form-item>
-      <el-form-item label="出版日期">
-        <el-date-picker
-          type="date"
-          placeholder="选择日期"
-          v-model="updaterBookForm.pressTime"
-          style="width: 100%;"
-        ></el-date-picker>
-      </el-form-item>
-      <el-form-item label="简介">
-        <el-input v-model="updaterBookForm.shortIntro"></el-input>
-      </el-form-item>
+        <el-form-item label="出版社">
+          <el-input v-model="updaterBookForm.bookPress"></el-input>
+        </el-form-item>
+        <el-form-item label="出版日期">
+          <el-date-picker
+            type="date"
+            placeholder="选择日期"
+            v-model="updaterBookForm.pressTime"
+            style="width: 100%;"
+          ></el-date-picker>
+        </el-form-item>
+        <el-form-item label="简介">
+          <el-input v-model="updaterBookForm.shortIntro"></el-input>
+        </el-form-item>
         <el-form-item label="阅读数量">
           <el-input v-model="updaterBookForm.bookreadnum"></el-input>
         </el-form-item>
@@ -229,7 +244,7 @@
         <el-form-item label="上传图书资源">
           <el-upload
             class="upload-demo"
-            action="http://localhost:8081/bookResource/upload"
+            action="http://localhost:8087/bookResource/upload"
             :file-list="fileList"
             :on-success="uploadSuccess"
           >
@@ -340,13 +355,26 @@
         <el-button type="primary" @click="updateBookType">确 认</el-button>
       </span>
     </el-dialog>
+    <el-dialog title="书籍预览" :visible.sync="showPdf" width="70%">
+      <div style="height:450px">
+        <iframe
+          :src="pdfSrc"
+          type="application/x-google-chrome-pdf"
+          width="100%"
+          height="100%"
+        />
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
 import dateFormat from "../../assets/js/Date";
+import pdf from "vue-pdf";
 export default {
   data() {
     return {
+      pdfSrc: "",
+      showPdf: false,
       updaterBookTypeForm: {},
       showUpdateDialog11: false,
       dialogTableVisible11: false,
@@ -361,7 +389,7 @@ export default {
         id: 0,
         bookname: "",
         pageNum: 1,
-        pageSize: 5,
+        pageSize: 3,
         isCharge: "",
         bookTypeId: ""
       },
@@ -401,7 +429,13 @@ export default {
     this.getBookTokenList();
     this.getBookTypeList();
   },
+
   methods: {
+    handlePdf(src) {
+      console.log(src)
+      this.showPdf = true;
+      this.pdfSrc = src;
+    },
     async getBookTokenList() {
       const param = this.param;
       const { data: res } = await this.$http.get(`/bookToken/list/1/10`);
@@ -617,6 +651,9 @@ export default {
       this.$refs.addBookTypeForm.resetFields;
       this.showaddDialog11 = false;
     }
+  },
+  components: {
+    pdf
   },
   filters: {
     formatDate(time) {

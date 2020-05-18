@@ -44,15 +44,21 @@
           </el-form-item>
         </el-form>
         <!--注册-->
-        <el-form :model="registerForm" ref="registerFormRef" size="mini" v-show="registerFlag">
-          <el-form-item prop="userName">
+        <el-form
+          :model="registerForm"
+          ref="registerFormRef"
+          :rules="registerRule"
+          size="mini"
+          v-show="registerFlag"
+        >
+          <el-form-item prop="exUsername">
             <el-input
               prefix-icon="el-icon-user"
               v-model="registerForm.exUsername"
               placeholder="请输入用户名"
             ></el-input>
           </el-form-item>
-          <el-form-item prop="password" style="margin-top:20px">
+          <el-form-item prop="exPwd" style="margin-top:20px">
             <el-input
               prefix-icon="el-icon-lock"
               v-model="registerForm.exPwd"
@@ -60,7 +66,7 @@
               show-password
             ></el-input>
           </el-form-item>
-          <el-form-item prop="name" style="margin-top:20px">
+          <el-form-item prop="exName" style="margin-top:20px">
             <el-input prefix-icon="el-icon-edit" v-model="registerForm.exName" placeholder="请输入姓名"></el-input>
           </el-form-item>
           <el-form-item prop="exPhone" style="margin-top:20px">
@@ -74,8 +80,14 @@
             <el-input prefix-icon="el-icon-edit" v-model="registerForm.exAddr" placeholder="请输入地址"></el-input>
           </el-form-item>
           <el-form-item label="擅长的书籍分类:">
-            <el-checkbox-group v-model="bookTypeList1" >
-              <el-checkbox v-for="(item,index) in bookTypeList" :key="index" :label="item.btName" name="index" @change="checkBookType(item.id)"></el-checkbox>
+            <el-checkbox-group v-model="bookTypeList1">
+              <el-checkbox
+                v-for="(item,index) in bookTypeList"
+                :key="index"
+                :label="item.btName"
+                name="index"
+                @change="checkBookType(item.id)"
+              ></el-checkbox>
             </el-checkbox-group>
           </el-form-item>
           <el-form-item>
@@ -88,7 +100,7 @@
               ></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item prop="identity" style="margin-top:20px">
+          <el-form-item prop="exIdentity" style="margin-top:20px">
             <el-input
               prefix-icon="el-icon-user"
               v-model="registerForm.exIdentity"
@@ -108,9 +120,9 @@
 export default {
   data() {
     return {
-      bookTypeList:[],
-      bookTypeList1:[],
-      bookTypeResult:[],
+      bookTypeList: [],
+      bookTypeList1: [],
+      bookTypeResult: [],
       registerFlag: false,
       img: "",
       loginForm: {
@@ -128,7 +140,21 @@ export default {
         exAddr: "",
         exTypeId: "",
         exIdentity: "",
-        bookTypes:""
+        bookTypes: ""
+      },
+      registerRule: {
+        exAddr:[{ required: true, message: "地址不能为空", trigger: "blur" }],
+        exName:[ { required: true, message: "姓名不能为空", trigger: "blur" }],
+        exIdentity: [{min: 18, max: 18, message: "必须为18位", trigger: "blur"}],
+        exPhone:[{min: 11, max: 11, message: "手机号必须为11位", trigger: "blur"}],
+        exUsername: [
+          { required: true, message: "请输入用户名", trigger: "blur" },
+          { min: 2, max: 10, message: "长度在 2 到 10 个字符", trigger: "blur" }
+        ],
+        exPwd: [
+          { required: true, message: "请输入密码", trigger: "blur" },
+          { min: 6, max: 16, message: "长度在 6 到 16 个字符", trigger: "blur" }
+        ],
       },
       loginRules: {
         username: [
@@ -151,11 +177,11 @@ export default {
   },
   methods: {
     async getBookTypes() {
-      const{data:res} = await this.$http.get('/book/book_type')
+      const { data: res } = await this.$http.get("/book/book_type");
       this.bookTypeList = res.data;
     },
     checkBookType(item) {
-      this.bookTypeResult.push(item)
+      this.bookTypeResult.push(item);
     },
     resetForm() {
       this.$refs.loginFormRef.resetFields();
@@ -175,7 +201,9 @@ export default {
       this.expertTypeList = res.data;
     },
     async register() {
-      this.registerForm.bookTypes = this.bookTypeResult.toString()
+      this.$refs.registerFormRef.validate(async valid => {
+        if (!valid) return;
+      this.registerForm.bookTypes = this.bookTypeResult.toString();
       const { data: res } = await this.$http.post(
         "/register",
         this.registerForm
@@ -187,6 +215,7 @@ export default {
         type: "success",
         message: "注册成功，请等待管理员审核通过才能登录",
         duration: 3000
+      });
       });
     },
     login() {
