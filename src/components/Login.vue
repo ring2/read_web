@@ -146,6 +146,7 @@ export default {
     };
   },
   created() {
+    document.title = 'tutor-it图书管理'
     this.getCaptcha();
     this.getBookTypes();
   },
